@@ -1,0 +1,15 @@
+tasks:
+  build-deps:
+    runner: razorci/openjdk
+    steps:
+    - checkout
+    - docker/build: 
+        dockerfile: Dockerfile
+    - cache/pull:
+        key: maven-repo-{{ checksum "pom.xml" }}
+        fallback_key: maven-repo-
+    - run: mvn -q clean package
+    - run: mvn surefire-report:report
+    - reports/junit:
+      - target/surefire-reports/TEST-*.xml
+      - target/failsafe-reports/TEST-*.xml
